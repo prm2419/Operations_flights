@@ -1,0 +1,130 @@
+import heapq  # (min-heap)
+
+# Función para calcular la ruta óptima usando Dijkstra
+def dijkstra(source, target, graph, initial_fuel):
+    """
+    Implementa el algoritmo de Dijkstra para encontrar la ruta más eficiente en términos de tiempo
+    y respetando el límite de combustible.
+
+    Parámetros:
+    - source: Nodo de inicio.
+    - target: Nodo de destino.
+    - graph: Lista de adyacencia que representa el grafo (conexiones entre aeropuertos).
+    - initial_fuel: Cantidad inicial de combustible.
+
+    Retorna:
+    - path: Lista con la ruta óptima desde el nodo origen hasta el destino.
+    - min_time[target]: Tiempo mínimo acumulado para llegar al destino.
+    - fuel_remaining[target]: Combustible restante al llegar al destino.
+    """
+    n = len(graph)  # Número de nodos (aeropuertos) en el grafo
+
+    # Inicialización de listas para rastrear tiempo mínimo y combustible restante
+    min_time = [float('inf')] * n  # Tiempo mínimo acumulado para llegar a cada nodo
+    fuel_remaining = [0.0] * n    # Combustible restante al llegar a cada nodo
+    previous = [-1] * n           # Para reconstruir el camino óptimo
+
+    # Cola de prioridad para procesar nodos; se guarda (tiempo acumulado, nodo, combustible restante)
+    pq = []
+    heapq.heappush(pq, (0.0, source, initial_fuel))  # Inicializar con el nodo fuente (tiempo=0, combustible inicial)
+    min_time[source] = 0.0
+    fuel_remaining[source] = initial_fuel
+
+    while pq:
+        # Extrae el nodo con el menor tiempo acumulado
+        current_time, current_node, current_fuel = heapq.heappop(pq)
+
+        # Si ya estamos en el destino, terminamos
+        if current_node == target:
+            break
+
+        # Explorar todos los nodos vecinos del nodo actual
+        for neighbor, fuel_cost, time_cost in graph[current_node]:
+            new_fuel = current_fuel - fuel_cost          # Combustible restante tras tomar esta conexión
+            new_time = current_time + time_cost         # Tiempo acumulado tras tomar esta conexión
+
+            # Si la conexión es válida (suficiente combustible) y mejora el tiempo mínimo
+            if new_fuel >= 0 and new_time < min_time[neighbor]:
+                # Actualizar las listas con los nuevos valores óptimos
+                min_time[neighbor] = new_time
+                fuel_remaining[neighbor] = new_fuel
+                previous[neighbor] = current_node
+                # Añadir el nodo vecino a la cola de prioridad
+                heapq.heappush(pq, (new_time, neighbor, new_fuel))
+
+    # Reconstrucción de la ruta desde el destino hacia el origen
+    path = []
+    current = target
+    while current != -1:
+        path.append(current)
+        current = previous[current]
+    path.reverse()  # Invierte la lista para obtener el orden correcto
+
+    # Si no se encontró un camino al destino, retornamos valores que indican fallo
+    if min_time[target] == float('inf'):
+        return [], float('inf'), 0.0
+
+    return path, min_time[target], fuel_remaining[target]
+
+
+GRU# Función principal para manejar la entrada y salida
+if __name__ == "__main__":
+    # Entrada: número de aeropuertos
+    n = int(input("Número de aeropuertos: "))
+
+    # Mapeo de nombres de aeropuertos a índices numéricos
+    airport_names = {}  # Diccionario para convertir nombres a índices
+    reverse_mapping = {}  # Diccionario inverso para mostrar resultados con nombres
+
+    print("Introduce los nombres de los aeropuertos:")
+    for i in range(n):
+        name = input(f"Aeropuerto {i+1}: ")
+        airport_names[name] = i
+        reverse_mapping[i] = name
+
+    # Crear el grafo como lista de adyacencia
+    graph = [[] for _ in range(n)]
+
+    # Entrada: origen y destino
+    source_name = input("Aeropuerto origen: ")
+    target_name = input("Aeropuerto destino: ")
+
+    # Validación de los aeropuertos de origen y destino
+    if source_name not in airport_names or target_name not in airport_names:
+        print("Error: Uno o más aeropuertos no están en la lista.")
+        exit()
+
+    source = airport_names[source_name]
+    target = airport_names[target_name]
+
+    # Entrada: conexiones entre aeropuertos
+    m = int(input("Número de conexiones: "))
+    print("Ingrese las conexiones:") # en el formato 'origen destino costo_combustible costo_tiempo':L}
+    for _ in range(m):
+        u_name, v_name, fuel_cost, time_cost = input().split()
+        fuel_cost = float(fuel_cost)
+        time_cost = float(time_cost)
+
+        # Validación de los nombres de los aeropuertos en las conexiones
+        if u_name not in airport_names or v_name not in airport_names:
+            print(f"Error: Aeropuerto {u_name} o {v_name} no existe.")
+            exit()
+
+        u = airport_names[u_name]
+        v = airport_names[v_name]
+        # Agregar la conexión al grafo
+        graph[u].append((v, fuel_cost, time_cost))
+
+    # Entrada: cantidad inicial de combustible
+    initial_fuel = float(input("Cantidad inicial de combustible: "))
+
+    # Ejecución del algoritmo de Dijkstra
+    path, min_time, remaining_fuel = dijkstra(source, target, graph, initial_fuel)
+
+    # Salida de los resultados
+    if not path:
+        print("No se encontró un camino factible.")
+    else:
+        print(f"Tiempo mínimo para llegar al destino: {min_time:.2f} horas")
+        print(f"Combustible restante al llegar: {remaining_fuel:.2f} unidades")
+        print("Ruta optimizada:", " -> ".join(reverse_mapping[node] for node in path))
