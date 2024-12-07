@@ -1,0 +1,22 @@
+"""
+EJEMPLO RUTA SUDAMERICA
+Número de aeropuertos: 5
+Introduce los nombres de los aeropuertos:
+Aeropuerto 1: BOG
+Aeropuerto 2: LIM
+Aeropuerto 3: SCL
+Aeropuerto 4: EZE
+Aeropuerto 5: GRU
+Aeropuerto origen: BOG
+Aeropuerto destino: EZE
+Número de conexiones: 7
+Ingrese las conexiones en el formato 'origen destino costo_combustible costo_tiempo':
+BOG LIM 9380 2.21
+BOG GRU 21575 5.08
+LIM SCL 12250 2.88
+LIM EZE 15800 3.72
+GRU SCL 14450 3.40
+SCL EZE 7000 1.65
+GRU EZE 8500 2.00
+Cantidad inicial de combustible: 26000
+"""
