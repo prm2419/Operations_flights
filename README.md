@@ -1,0 +1,1 @@
+This repository contains the implementation of the Dijkstra algorithm for optimizing aircraft routing operations. The algorithm is designed to efficiently find the shortest paths in a network, minimizing operational costs and improving overall flight efficiency. If you have any questions, please do not hesitate to contact me.
